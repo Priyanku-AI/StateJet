@@ -36,48 +36,71 @@ const StyledError = styled.div`
 
 // Validation schema
 const validationSchema = Yup.object({
-  email: Yup.string().email('Invalid email').required('Email is required'),
-  password: Yup.string().min(4, 'Too short').required('Password is required'),
+    email: Yup.string().email('Invalid email').required('Email is required'),
+    password: Yup.string().min(4, 'Too short').required('Password is required'),
 });
 
 const Login = () => {
-  const handleSubmit = (values) => {
-    console.log('Form data:', values);
-    // You can send this data to your backend here
-  
 
-   // Dummy login check
-   if (values.email === 'test@example.com' && values.password === '1234') {
-    toast.success('Login successful!');
-    resetForm();
-  } else {
-    toast.error('Invalid email or password');
-  }
-};
+    const handleSubmit = async (values, { resetForm }) => {
+        try {
+            // 1. Send login request
+            const res = await fetch('https://reqres.in/api/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'x-api-key': 'reqres-free-v1',
+                },
+                body: JSON.stringify(values),
+            });
 
+            if (!res.ok) throw new Error('Login failed');
 
-  return (
-    <Container>
-      <h2>Login</h2>
-      <Formik
-        initialValues={{ email: '', password: '' }}
-        validationSchema={validationSchema}
-        onSubmit={handleSubmit}
-      >
-        <Form>
-          <label>Email</label>
-          <StyledField type="email" name="email" />
-          <ErrorMessage name="email" component={StyledError} />
+            const data = await res.json();
+            console.log('Login success. Token:', data.token);
 
-          <label>Password</label>
-          <StyledField type="password" name="password" />
-          <ErrorMessage name="password" component={StyledError} />
+            toast.success('Login successful! Fetching user data...');
 
-          <StyledButton type="submit">Login</StyledButton>
-        </Form>
-      </Formik>
-    </Container>
-  );
+            // 2. Fetch user details (dummy user id 2)
+            const userRes = await fetch('https://reqres.in/api/users/2', {
+                headers: {
+                    'Content-Type': 'application/json',
+                    'x-api-key': 'reqres-free-v1',
+                }
+            });
+            const userData = await userRes.json();
+
+            console.log('User Details:', userData.data);
+            toast.success(`Welcome, ${userData.data.first_name}`);
+
+            resetForm();
+        } catch (error) {
+            console.error('Login Error:', error);
+            toast.error('Invalid email or password');
+        }
+    };
+    return (
+        <Container>
+            <h2>Login</h2>
+            <Formik
+                initialValues={{ email: '', password: '' }}
+                validationSchema={validationSchema}
+                onSubmit={handleSubmit}
+            >
+                <Form>
+                    <label>Email</label>
+                    <StyledField type="email" name="email" />
+                    <ErrorMessage name="email" component={StyledError} />
+
+                    <label>Password</label>
+                    <StyledField type="password" name="password" />
+                    <ErrorMessage name="password" component={StyledError} />
+
+                    <StyledButton type="submit">Login</StyledButton>
+                </Form>
+            </Formik>
+        </Container>
+    );
 };
 
 export default Login;
