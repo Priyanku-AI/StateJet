@@ -3,6 +3,9 @@ import * as Yup from 'yup';
 import styled from 'styled-components';
 import toast from 'react-hot-toast';
 import { userState, tokenState } from "../state/userData"
+import { useNavigate } from 'react-router-dom';
+
+
 
 // Styled components
 const Container = styled.div`
@@ -42,7 +45,7 @@ const validationSchema = Yup.object({
 });
 
 const Login = () => {
-
+    const navigate = useNavigate();
 
     // {
     //     "email": "eve.holt@reqres.in",
@@ -81,6 +84,7 @@ const Login = () => {
 
             console.log('User Details:', userState.get());
             toast.success(`Welcome, ${userState.get().first_name}`);
+            navigate("/profile");
 
             // resetForm();
         } catch (error) {
