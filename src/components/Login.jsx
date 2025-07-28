@@ -2,6 +2,7 @@ import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
 import styled from 'styled-components';
 import toast from 'react-hot-toast';
+import { userState } from "../state/userState"
 
 // Styled components
 const Container = styled.div`
@@ -42,6 +43,12 @@ const validationSchema = Yup.object({
 
 const Login = () => {
 
+
+    // {
+    //     "email": "eve.holt@reqres.in",
+    //     "password": "cityslicka"
+    //   }
+
     const handleSubmit = async (values, { resetForm }) => {
         try {
             // 1. Send login request
@@ -57,7 +64,8 @@ const Login = () => {
             if (!res.ok) throw new Error('Login failed');
 
             const data = await res.json();
-            console.log('Login success. Token:', data.token);
+            userState.token = data.token
+            console.log('Login success. Token:', userState.token);
 
             toast.success('Login successful! Fetching user data...');
 
@@ -69,9 +77,10 @@ const Login = () => {
                 }
             });
             const userData = await userRes.json();
+            userState.user = userData.data
 
-            console.log('User Details:', userData.data);
-            toast.success(`Welcome, ${userData.data.first_name}`);
+            console.log('User Details:', userState.user);
+            toast.success(`Welcome, ${userState.user.first_name}`);
 
             resetForm();
         } catch (error) {
