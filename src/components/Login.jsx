@@ -1,6 +1,7 @@
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
 import styled from 'styled-components';
+import toast from 'react-hot-toast';
 
 // Styled components
 const Container = styled.div`
@@ -43,7 +44,17 @@ const Login = () => {
   const handleSubmit = (values) => {
     console.log('Form data:', values);
     // You can send this data to your backend here
-  };
+  
+
+   // Dummy login check
+   if (values.email === 'test@example.com' && values.password === '1234') {
+    toast.success('Login successful!');
+    resetForm();
+  } else {
+    toast.error('Invalid email or password');
+  }
+};
+
 
   return (
     <Container>
